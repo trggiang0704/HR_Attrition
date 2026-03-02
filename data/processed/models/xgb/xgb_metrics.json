@@ -1,0 +1,12 @@
+{
+    "model": "XGBoost",
+    "pr_auc": 0.6431958779421679,
+    "f1_score": 0.4689655172413793,
+    "train_time_sec": 0.2771139144897461,
+    "n_estimators": 300,
+    "max_depth": 5,
+    "learning_rate": 0.05,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "random_state": 42
+}
