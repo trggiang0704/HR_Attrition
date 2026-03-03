@@ -1,0 +1,13 @@
+{
+    "model": "RandomForest",
+    "pr_auc": 0.5566438811143449,
+    "f1_score": 0.524822695035461,
+    "recall_leave": 0.7708333333333334,
+    "precision_leave": 0.3978494623655914,
+    "best_threshold": 0.30000000000000004,
+    "train_time_sec": 0.6123349666595459,
+    "n_estimators": 400,
+    "max_depth": 12,
+    "class_weight": "balanced",
+    "random_state": 42
+}
