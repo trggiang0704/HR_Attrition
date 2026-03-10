@@ -1,0 +1,108 @@
+SEMI-SUPERVISED LEARNING SUMMARY
+====================================================================================================
+
+   labeled_ratio         model  accuracy  precision    recall        f1       auc
+0            10%   XGBoost-Sup  0.837838   0.500000  0.250000  0.333333  0.704385
+1            10%        RF-Sup  0.824324   0.409091  0.187500  0.257143  0.772807
+2            10%  XGBoost-Semi  0.824324   0.388889  0.145833  0.212121  0.709089
+3            10%       RF-Semi  0.827703   0.411765  0.145833  0.215385  0.713542
+4            20%   XGBoost-Sup  0.871622   0.777778  0.291667  0.424242  0.765877
+5            20%        RF-Sup  0.861486   0.818182  0.187500  0.305085  0.782804
+6            20%  XGBoost-Semi  0.847973   0.800000  0.083333  0.150943  0.743868
+7            20%       RF-Semi  0.847973   0.666667  0.125000  0.210526  0.742902
+8            30%   XGBoost-Sup  0.875000   0.923077  0.250000  0.393443  0.802671
+9            30%        RF-Sup  0.854730   1.000000  0.104167  0.188679  0.783644
+10           30%  XGBoost-Semi  0.854730   1.000000  0.104167  0.188679  0.793095
+11           30%       RF-Semi  0.847973   0.800000  0.083333  0.150943  0.727319
+1️⃣  RỦI RO CHÍNH CỦA PSEUDO-LABEL:
+   ├─ Label Noise (Nhiễu nhãn):
+   │  └─ Bộ phân loại có thể tự tin sai lạc vào những mẫu khó
+   │     → Thêm vào dữ liệu training → Huấn luyện lại bộ phân loại xấu hơn
+   │
+   ├─ Confirmation Bias (Sai lệch xác nhận):
+   │  └─ Model học từ pseudo-label của chính nó
+   │     → Khuếch đại lỗi ban đầu qua các iteration
+   │
+   ├─ Class Imbalance:
+   │  └─ Nếu model ban đầu có bias với một lớp
+   │     → Pseudo-label cũng sẽ bị bias
+   │
+   └─ Diminishing Returns:
+      └─ Sau vài iteration, ngành chất lượng pseudo-label giảm
+         → Cần dừng sớm (early stopping)
+
+2️⃣  KỸ THUẬT GIẢM RỦI RO:
+
+   a) Threshold cao (Confidence Threshold):
+      └─ Chỉ chọn mẫu có confidence >= 0.85-0.95
+      └─ Tuy nhiên: Giảm số mẫu pseudo-label → Hiệu suất học bị hạn chế
+
+   b) Diversity & Ensemble:
+      └─ Dùng nhiều bộ phân loại độc lập → Pseudo-label từ consensus
+      └─ Giảm riêng ico bias của 1 model
+
+   c) Iterative Refinement:
+      └─ Giới hạn số iteration (max_iterations)
+      └─ Monitor hiệu suất trên validation set
+
+🎯 KẾT LUẬN CHÍNH:
+
+1. CÓ NÊN DÙNG PSEUDO-LABEL KHÔNG?
+   
+   ✅ NÊN khi:
+      • Dữ liệu labeled rất ít (< 20%)
+      • Model đạt F1 >= 0.70+ trên labeled data
+      • Có thể monitor chất lượng pseudo-label qua confidence distribution
+   
+   ❌ KHÔNG nên khi:
+      • Model ban đầu yếu (F1 < 0.60)
+      • Class imbalance quá lớn (tỷ lệ 1:10 trở lên)
+      • Dữ liệu unlabeled có distribution khác xa labeled data
+
+2. CÁCH DÙNG AN TOÀN PSEUDO-LABEL:
+   
+   Step 1: Kiểm tra chất lượng model ban đầu trên validation set
+           → F1 >= 0.65? → Có thể dùng pseudo-label
+   
+   Step 2: Đặt threshold cao (0.85-0.95) để cĩ pseudo-label chất lượng
+           → Trade-off: Ít mẫu nhưng chất lượng cao
+   
+   Step 3: Limit số iteration (3-5) để tránh "feedback loop" xấu
+           → Monitor hiệu suất validation sau mỗi iteration
+   
+   Step 4: So sánh với supervised baseline
+           → Nếu worse → Dừng, dùng supervised model
+           → Nếu better → Tiếp tục với caution
+
+3. THÊM KỸ THUẬT GIẢM RỦI RO:
+   
+   • Multi-model voting: Dùng 3+ models không liên quan
+                         → Pseudo-label từ đa số vote
+   
+   • Confidence weighting: Gán trọng số theo confidence
+                           → High confidence → high weight
+   
+   • Active learning: Con người check high-uncertainty mẫu
+                      → Giảm manual labeling cost
+
+4. MONITORING METRICS:
+   
+   ✓ Confidence distribution:
+      → Giảm dần qua iteration? → Rủi ro cao
+      → Luôn trên 0.90? → Safe
+   
+   ✓ Recall (find Leave):
+      → Tăng? → Tốt (phát hiện churn tốt hơn)
+      → Giảm? → Rủi ro: Model bị bias
+   
+   ✓ Test set performance:
+      → Nên tăng or không đổi (so với supervised)
+      → Nếu giảm → Pseudo-label nhiễu quá
+
+═" Kết luận chung:
+   Semi-supervised learning (Self-training) là công cụ mạnh khi:
+   • Dữ liệu labeled ít
+   • Model ban đầu chất lượng tốt
+   • Kỹ thuật được áp dụng cẩn thận
+   
+   Nhưng RỦI RO lớn nếu không kiểm soát → cần validation kỹ lưỡng!
