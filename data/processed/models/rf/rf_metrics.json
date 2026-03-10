@@ -5,7 +5,7 @@
     "recall_leave": 0.7708333333333334,
     "precision_leave": 0.3978494623655914,
     "best_threshold": 0.30000000000000004,
-    "train_time_sec": 0.6123349666595459,
+    "train_time_sec": 0.7242584228515625,
     "n_estimators": 400,
     "max_depth": 12,
     "class_weight": "balanced",
